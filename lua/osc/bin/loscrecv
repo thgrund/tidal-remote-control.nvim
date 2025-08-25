@@ -1,0 +1,64 @@
+#!/usr/bin/env lua
+
+local losc = require'losc'
+local Timetag = require'losc.timetag'
+local ok, plugin = pcall(require, 'losc.plugins.udp-socket')
+if not ok then
+  local msg = 'loscsend requires `luasocket`\nTry: `luarocks install luasocket`'
+  io.stderr:write(msg)
+  return
+end
+
+local function usage()
+  local str = ''
+  str = str .. 'loscrecv - Dump incoming OSC data.\n'
+  str = str .. '\nusage: loscsend port'
+  str = str .. '\nexample: loscrecv 9000\n'
+  io.write(str)
+end
+
+-- Main
+
+if arg and arg[1] == '-h' or arg[1] == '--help' then
+  usage()
+  os.exit(0)
+end
+
+local port = arg[1]
+if not port then
+  usage()
+  os.exit(0)
+end
+
+local osc = losc.new {plugin = plugin.new()}
+
+osc:add_handler('*', function(data)
+  local tt = Timetag.new_from_timestamp(data.timestamp)
+  local time = string.format('%08x.%08x', tt:seconds(), tt:fractions())
+  local ok, message = pcall(osc.new_message, data.message)
+  if not ok then
+    print(message)
+    return
+  end
+  io.write(time .. ' ')
+  io.write(message:address() .. ' ')
+  io.write(message:types() .. ' ')
+  for i, type_, arg_ in message:iter() do
+    if type_ == 's' then
+      io.write(string.format('"%s" ', arg_))
+    elseif type_ == 'b' then
+      io.write(string.format('[%d byte blob] ', #arg_))
+    elseif type_ == 'f' or type_ == 'd' then
+      io.write(string.format('%06f ', arg_))
+    elseif type_ == 'i' or type_ 'h' then
+      io.write(string.format('%d ', arg_))
+    elseif type_ == 't' then
+      local tmp = Timetag.new_from_timestamp(arg_)
+      string.format('%08x.%08x', tmp:seconds(), tmp:fractions())
+    else
+      io.write(tostring(arg_) .. ' ')
+    end
+  end
+  io.write('\n')
+end)
+osc:open('127.0.0.1', arg[1] or 0)
