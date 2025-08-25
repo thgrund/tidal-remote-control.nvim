@@ -1,11 +1,11 @@
 local losc = require("losc")
 local plugin = require("losc.src.losc.plugins.udp-libuv")
 
+local config = require("remote-control.config")
+
 local M = {}
 
-function M.start()
-	local host = "127.0.0.1"
-	local port = 3333
+local function startOSC(host, port)
 	local transport = plugin.new({ recvAddr = host, recvPort = port })
 	local osc = losc.new({ plugin = transport })
 
@@ -34,6 +34,13 @@ function M.start()
 	print("Tidal OSC Init was called" .. "\n" .. host .. "\n" .. port)
 
 	osc:open()
+end
+
+function M.start()
+	local opts = config.options
+
+	local oscEval = opts.boot.tidal.oscEval
+	startOSC(oscEval.ip, oscEval.port)
 end
 
 return M
