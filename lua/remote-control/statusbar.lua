@@ -118,7 +118,6 @@ local function startClient()
 
 	vim.keymap.set("n", "<leader>ts", function()
 		local count = vim.v.count1 - 1 -- if no number given, defaults to 1
-		vim.cmd("echo 'You passed " .. count .. "'")
 
 		osc:send(losc.new_message({
 			address = "/SuperDirtMixer/midiControlButton",
@@ -131,7 +130,7 @@ local function startClient()
 			types = "i",
 			count,
 		}))
-	end)
+	end, { desc = "Send remote control index" })
 end
 
 local function createStatusBar()
@@ -142,7 +141,6 @@ local function createStatusBar()
 	local cur_win = vim.api.nvim_get_current_win()
 
 	-- Do a split inside the current window
-	vim.cmd("left")
 	vim.cmd("belowright split")
 	vim.cmd("resize 1")
 

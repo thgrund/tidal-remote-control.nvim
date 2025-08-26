@@ -34,7 +34,7 @@ local function startOSC(host, port)
 	osc:open()
 end
 
-function M.start()
+function M.create()
 	local opts = config.options
 
 	local oscEval = opts.boot.tidal.oscEval
