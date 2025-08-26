@@ -109,8 +109,6 @@ local function startRemoteControlServer(host, port)
 		end)
 	end)
 
-	print("MrReason Song Metadata \nOSC Server Init was called" .. "\n" .. host .. "\n" .. port)
-
 	osc:open()
 end
 

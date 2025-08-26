@@ -31,8 +31,6 @@ local function startOSC(host, port)
 		end)
 	end)
 
-	print("Tidal OSC Init was called" .. "\n" .. host .. "\n" .. port)
-
 	osc:open()
 end
 
